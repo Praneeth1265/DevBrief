@@ -1,5 +1,4 @@
 name: DevBrief
-
 on:
   schedule:
     - cron: "45 0 * * *"     # daily  06:15 IST (GitHub may start it 5-30 min late)
