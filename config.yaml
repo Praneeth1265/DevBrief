@@ -57,7 +57,7 @@ delivery:
   email: false                # optional Gmail copy (needs GMAIL_ADDRESS + GMAIL_APP_PASSWORD)
   push: false                 # optional ntfy.sh push (needs NTFY_TOPIC)
   # Public URL of the app (your GitHub Pages site), e.g. https://<your-username>.github.io/devbrief
-  site_url: ""
+  site_url: "https://Praneeth1265.github.io/devbrief"
 
 llm:
   provider: auto              # auto | gemini | anthropic | none
