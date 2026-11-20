@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+preview.html
+.pytest_cache/
+demo_site/
+demo_email.html

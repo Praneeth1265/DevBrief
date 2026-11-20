@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DevBrief · {{ pretty_date }}</title></head>
+<body style="margin:0;padding:0;background:#f4f2ee;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1d1d1f;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f2ee;">
+<tr><td align="center" style="padding:20px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
+
+  <!-- header -->
+  <tr><td style="padding:4px 4px 16px;">
+    <div style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#8a5a00;font-weight:700;">☕ DevBrief</div>
+    <div style="font-size:24px;font-weight:700;margin-top:4px;line-height:1.25;">{{ pretty_date }}</div>
+    {% if digest.tldr %}<div style="font-size:15px;color:#3a3a3c;margin-top:8px;line-height:1.5;"><b>TL;DR</b> — {{ digest.tldr }}</div>{% endif %}
+    <div style="font-size:12px;color:#6e6e73;margin-top:8px;">{{ digest.items|length }} picks · ~{{ total_minutes }} min total{% if site_url %} · <a href="{{ site_url }}" style="color:#8a5a00;">read on web</a>{% endif %}</div>
+  </td></tr>
+
+  {% for key, label in sections %}{% set items = digest.by_section(key) %}{% if items %}
+  <tr><td style="padding:14px 4px 6px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6e6e73;">{{ label }}</td></tr>
+  {% for it in items %}
+  <tr><td style="padding:0 0 10px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;{% if key == 'top_story' %}border:2px solid #e8a33d;{% elif key == 'security' %}border-left:4px solid #d64545;{% else %}border:1px solid #e5e1d8;{% endif %}">
+    <tr><td style="padding:14px 16px;">
+      <a href="{{ it.url }}" style="font-size:{% if key == 'top_story' %}18{% else %}16{% endif %}px;font-weight:650;color:#1d1d1f;text-decoration:none;line-height:1.35;">{{ it.title }}</a>
+      <div style="font-size:12px;color:#6e6e73;margin-top:4px;">{{ it.source }}{% if it.read_minutes %} · {{ it.read_minutes }} min{% endif %}{% if it.points %} · ▲{{ it.points }}{% endif %}{% for t in it.tags %} · #{{ t }}{% endfor %}</div>
+      <div style="font-size:15px;line-height:1.5;margin-top:8px;color:#1d1d1f;">{{ it.one_liner }}</div>
+      {% if it.why_read %}<div style="font-size:14px;line-height:1.5;margin-top:8px;padding:8px 10px;background:#fbf6ea;border-radius:8px;color:#5c4300;"><b>Why read:</b> {{ it.why_read }}</div>{% endif %}
+      {% if it.comments_url and it.comments_url != it.url %}<div style="font-size:12px;margin-top:8px;"><a href="{{ it.comments_url }}" style="color:#8a5a00;">Discussion →</a></div>{% endif %}
+    </td></tr></table>
+  </td></tr>
+  {% endfor %}{% endif %}{% endfor %}
+
+  {% if digest.concept and digest.concept.name %}
+  <tr><td style="padding:14px 4px 6px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6e6e73;">🎯 Interview angle</td></tr>
+  <tr><td style="padding:0 0 10px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#1f2a44;border-radius:12px;"><tr><td style="padding:16px;color:#f2f2f7;">
+      <div style="font-size:17px;font-weight:700;">{{ digest.concept.name }}</div>
+      <div style="font-size:14px;line-height:1.55;margin-top:6px;color:#d8dbe6;">{{ digest.concept.explanation }}</div>
+      {% if digest.concept.interview_question %}<div style="font-size:14px;line-height:1.5;margin-top:10px;color:#ffd48a;"><b>Q:</b> {{ digest.concept.interview_question }}</div>{% endif %}
+      {% if digest.concept.related_url %}<div style="font-size:12px;margin-top:8px;"><a href="{{ digest.concept.related_url }}" style="color:#9fb4ff;">Seen in today's news: {{ digest.concept.related_title }}</a></div>{% endif %}
+    </td></tr></table>
+  </td></tr>
+  {% endif %}
+
+  {% if digest.glossary %}
+  <tr><td style="padding:14px 4px 6px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6e6e73;">📖 Jargon buster</td></tr>
+  <tr><td style="padding:0 0 10px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e5e1d8;border-radius:12px;"><tr><td style="padding:12px 16px;font-size:14px;line-height:1.6;">
+      {% for g in digest.glossary %}<div><b>{{ g.term }}</b> — {{ g.meaning }}</div>{% endfor %}
+    </td></tr></table>
+  </td></tr>
+  {% endif %}
+
+  {% if not digest.items %}
+  <tr><td style="padding:20px 4px;font-size:15px;color:#3a3a3c;">Quiet day — nothing cleared your relevance bar. Enjoy the free 10 minutes. 🌤️</td></tr>
+  {% endif %}
+
+  <tr><td style="padding:18px 4px;font-size:12px;color:#8e8e93;line-height:1.6;">
+    Scanned {{ digest.stats.fetched|default(0) }} items → {{ digest.stats.candidates|default(0) }} candidates → {{ digest.items|length }} picks
+    · dropped {{ digest.stats.duplicate|default(0) }} duplicates, {{ digest.stats.blocked_topic|default(0) }} off-topic, {{ digest.stats.already_sent|default(0) }} already sent
+    · curated by {{ digest.curated_by }}.<br>Tune topics &amp; sources in <code>config.yaml</code>.
+  </td></tr>
+</table></td></tr></table>
+</body></html>

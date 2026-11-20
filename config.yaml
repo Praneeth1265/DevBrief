@@ -1,0 +1,113 @@
+# ─────────────────────────────────────────────────────────────
+#  DevBrief config — edit this file to tune what lands in your inbox.
+#  Everything here is safe to change; no code edits needed.
+# ─────────────────────────────────────────────────────────────
+
+profile:
+  # The LLM reads this to judge relevance. Be honest and specific.
+  who: >
+    Final-year BTech CS student and software engineer in India, currently in
+    placement season. Builds web apps (React / Next.js / Node), interested in
+    backend, system design, cloud and AI/LLM engineering.
+  interests:            # weight 1-3 (3 = care a lot)
+    system design & architecture: 3
+    backend & distributed systems: 3
+    AI / LLM engineering & dev tools: 3
+    web development (React, Next.js, TypeScript, Node): 2
+    cloud & DevOps (AWS, Kubernetes, CI/CD): 2
+    security incidents that affect developers: 2
+    Indian IT industry, hiring & layoffs: 2
+    programming languages & major releases: 1
+    big-tech outages & postmortems: 2
+    major tech industry news (CEO changes, big acquisitions, antitrust, chip & AI business): 2
+    record hacks & breaches, including crypto exchanges (how they happened): 2
+  avoid:                # anything matching these is dropped before the LLM sees it
+    - crypto price
+    - bitcoin price
+    - deal
+    - discount
+    - "% off"
+    - black friday
+    - review:
+    - hands-on
+    - unboxing
+    - iphone case
+    - wallpaper
+    - horoscope
+    - sponsored
+    - giveaway
+
+digest:
+  timezone: Asia/Kolkata
+  lookback_hours: 30          # only items newer than this
+  max_items: 8                # hard cap — you will never get more than this
+  min_score: 6                # 1-10; LLM must rate an item ≥ this to include it
+  candidates_for_llm: 70      # how many pre-filtered items the LLM reviews
+  hn_min_points: 120          # Hacker News stories need this many points
+  sections:                   # order shown in the email
+    - top_story               # 1 must-know item
+    - headlines               # short news
+    - deep_read               # long-form engineering posts worth 10+ min
+    - career                  # hiring, layoffs, placements, skills in demand
+    - security                # only when something actually matters
+    - release_radar           # releases of tools you use
+
+delivery:
+  app_push: true              # notification straight into the DevBrief app (needs VAPID_* + WEBPUSH_SUBSCRIPTION)
+  email: false                # optional Gmail copy (needs GMAIL_ADDRESS + GMAIL_APP_PASSWORD)
+  push: false                 # optional ntfy.sh push (needs NTFY_TOPIC)
+  # Public URL of the app (your GitHub Pages site), e.g. https://<your-username>.github.io/devbrief
+  site_url: ""
+
+llm:
+  provider: auto              # auto | gemini | anthropic | none
+  gemini_models: [gemini-3.5-flash-lite, gemini-3.5-flash, gemini-2.5-flash]
+  anthropic_model: claude-haiku-5-5
+
+# GitHub repos whose stable releases go into "Release radar".
+release_radar:
+  - nodejs/node
+  - facebook/react
+  - vercel/next.js
+  - microsoft/TypeScript
+  - python/cpython
+  - kubernetes/kubernetes
+  - docker/compose
+
+# Sources. kind: news | blog | security | india | ai | aggregator
+# weight: 0.5 (noisy) … 1.5 (always high signal)
+sources:
+  # Aggregators (community-voted — strong signal)
+  - { name: Hacker News, kind: aggregator, weight: 1.3, type: hn }
+  - { name: Lobsters, kind: aggregator, weight: 1.1, url: "https://lobste.rs/hottest.rss" }
+
+  # Engineering news
+  - { name: InfoQ, kind: news, weight: 1.1, url: "https://feed.infoq.com/" }
+  - { name: Ars Technica, kind: news, weight: 0.9, url: "https://feeds.arstechnica.com/arstechnica/technology-lab" }
+  - { name: TechCrunch, kind: news, weight: 0.6, url: "https://techcrunch.com/feed/" }
+  - { name: The Verge, kind: news, weight: 0.5, url: "https://www.theverge.com/rss/tech/index.xml" }
+  - { name: GitHub Blog, kind: news, weight: 1.1, url: "https://github.blog/feed/" }
+  - { name: AWS News, kind: news, weight: 0.8, url: "https://aws.amazon.com/blogs/aws/feed/" }
+
+  # Deep engineering blogs
+  - { name: The Pragmatic Engineer, kind: blog, weight: 1.4, url: "https://newsletter.pragmaticengineer.com/feed" }
+  - { name: ByteByteGo, kind: blog, weight: 1.4, url: "https://blog.bytebytego.com/feed" }
+  - { name: Martin Fowler, kind: blog, weight: 1.3, url: "https://martinfowler.com/feed.atom" }
+  - { name: Netflix Tech Blog, kind: blog, weight: 1.2, url: "https://netflixtechblog.com/feed" }
+  - { name: Cloudflare Blog, kind: blog, weight: 1.2, url: "https://blog.cloudflare.com/rss/" }
+  - { name: Meta Engineering, kind: blog, weight: 1.1, url: "https://engineering.fb.com/feed/" }
+  - { name: Stripe Blog, kind: blog, weight: 1.0, url: "https://stripe.com/blog/feed.rss" }
+  - { name: Simon Willison, kind: blog, weight: 1.2, url: "https://simonwillison.net/atom/everything/" }
+
+  # AI
+  - { name: Hugging Face, kind: ai, weight: 1.0, url: "https://huggingface.co/blog/feed.xml" }
+  - { name: OpenAI News, kind: ai, weight: 1.0, url: "https://openai.com/news/rss.xml" }
+
+  # Security
+  - { name: BleepingComputer, kind: security, weight: 0.9, url: "https://www.bleepingcomputer.com/feed/" }
+  - { name: The Hacker News, kind: security, weight: 0.8, url: "https://feeds.feedburner.com/TheHackersNews" }
+  - { name: Krebs on Security, kind: security, weight: 1.0, url: "https://krebsonsecurity.com/feed/" }
+
+  # Indian tech industry
+  - { name: ET Tech, kind: india, weight: 0.9, url: "https://economictimes.indiatimes.com/tech/rssfeeds/13357270.cms" }
+  - { name: Inc42, kind: india, weight: 0.7, url: "https://inc42.com/feed/" }

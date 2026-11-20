@@ -1,0 +1,64 @@
+name: DevBrief
+
+on:
+  schedule:
+    - cron: "45 0 * * *"     # daily  06:15 IST (GitHub may start it 5-30 min late)
+    - cron: "30 2 * * 0"     # Sunday 08:00 IST week-in-review
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "run | weekly | test-delivery | rebuild-api"
+        default: run
+
+permissions:
+  contents: write
+
+concurrency:
+  group: devbrief
+  cancel-in-progress: false
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Pick command
+        id: cmd
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ inputs.command }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "30 2 * * 0" ]; then
+            echo "name=weekly" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=run" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build & deliver
+        run: python -m devbrief ${{ steps.cmd.outputs.name }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          DIGEST_TO: ${{ secrets.DIGEST_TO }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          WEBPUSH_SUBSCRIPTION: ${{ secrets.WEBPUSH_SUBSCRIPTION }}
+
+      - name: Save archive & memory
+        if: always() && steps.cmd.outputs.name != 'test-delivery'
+        run: |
+          git config user.name  "devbrief-bot"
+          git config user.email "devbrief-bot@users.noreply.github.com"
+          git add data docs
+          git diff --cached --quiet || git commit -m "brief: $(date -u +%F) ${{ steps.cmd.outputs.name }}"
+          git push
